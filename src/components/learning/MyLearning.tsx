@@ -75,11 +75,13 @@ export function MyLearning() {
             id,
             title,
             slug,
-            learning_path_id,
-            learning_paths (
-              id,
-              title,
-              slug
+            course_paths (
+              is_primary,
+              learning_paths (
+                id,
+                title,
+                slug
+              )
             )
           )
         `,
@@ -99,7 +101,10 @@ export function MyLearning() {
 
       for (const resource of resourcesData) {
         const courseData = (resource as any).courses;
-        const pathData = courseData?.learning_paths;
+        const coursePaths: any[] = courseData?.course_paths ?? [];
+        const primaryPath =
+          coursePaths.find((cp: any) => cp.is_primary) ?? coursePaths[0];
+        const pathData = primaryPath?.learning_paths;
 
         if (!courseData || !pathData) continue;
 

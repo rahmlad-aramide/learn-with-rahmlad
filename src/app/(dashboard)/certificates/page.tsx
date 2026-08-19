@@ -3,8 +3,9 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
+import { generateCertificatePDF } from "@/lib/certificates";
 import { Award, Download } from "lucide-react";
-import { Metadata } from "next";
+import Spinner from "@/components/ui/spinner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,8 +23,26 @@ export default function BlankPage() {
   const [user, setUser] = useState<any>(null);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  const handleDownload = async (certId: string, pathTitle: string) => {
+    setDownloading(certId);
+    try {
+      const blob = await generateCertificatePDF(certId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${pathTitle.replace(/\s+/g, "-").toLowerCase()}-certificate.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Certificate generation failed:", err);
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   useEffect(() => {
     checkAuth();
@@ -72,7 +91,7 @@ export default function BlankPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading...
+        <Spinner size="lg" variant="page" label="Loading certificates..." />
       </div>
     );
   }
@@ -120,9 +139,16 @@ export default function BlankPage() {
                 <Button
                   variant="outline"
                   className="mt-4 w-full gap-2 bg-transparent"
+                  onClick={() =>
+                    handleDownload(
+                      cert.id,
+                      cert.learning_paths?.title ?? "Certificate",
+                    )
+                  }
+                  disabled={downloading === cert.id}
                 >
                   <Download className="h-4 w-4" />
-                  Download
+                  {downloading === cert.id ? "Generating..." : "Download"}
                 </Button>
               </Card>
             ))}

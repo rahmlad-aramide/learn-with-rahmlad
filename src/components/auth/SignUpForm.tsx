@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [isGoldenGeneration, setIsGoldenGeneration] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,7 +28,7 @@ export default function SignUpForm() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        router.push("/");
+        router.push("/my-learning");
       }
       setCheckingAuth(false);
     };
@@ -50,11 +51,14 @@ export default function SignUpForm() {
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || window.location.origin,
+          emailRedirectTo:
+            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
+            window.location.origin,
           data: {
             first_name: firstName,
             last_name: lastName,
             role: "user",
+            is_golden_generation: isGoldenGeneration,
           },
         },
       });
@@ -142,7 +146,7 @@ export default function SignUpForm() {
                 Sign up with X
               </button>
             </div>
-            <div className="hidden relative py-3 sm:py-5">
+            <div className="relative hidden py-3 sm:py-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
               </div>
@@ -226,7 +230,7 @@ export default function SignUpForm() {
                     </span>
                   </div>
                 </div>
-                {/* <!-- Checkbox --> */}
+                {/* <!-- Terms Checkbox --> */}
                 <div className="flex items-center gap-3">
                   <Checkbox
                     className="h-5 w-5"
@@ -244,14 +248,31 @@ export default function SignUpForm() {
                     </span>
                   </p>
                 </div>
+                {/* <!-- Golden Generation Checkbox --> */}
+                <div className="flex items-start gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-500/20 dark:bg-yellow-500/5">
+                  <Checkbox
+                    className="mt-0.5 h-5 w-5"
+                    checked={isGoldenGeneration}
+                    onChange={setIsGoldenGeneration}
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                      Golden Generation Community Member
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      I am a member of the Golden Generation Community
+                      Development Club
+                    </p>
+                  </div>
+                </div>
                 {error && (
-                  <div className="rounded-md bg-error-50 p-3 text-sm text-error-500 dark:bg-error-500/10 fade-in-0 slide-in-from-top-1 animate-in">
+                  <div className="bg-error-50 text-error-500 dark:bg-error-500/10 fade-in-0 slide-in-from-top-1 animate-in rounded-md p-3 text-sm">
                     {error}
                   </div>
                 )}
                 {/* <!-- Button --> */}
                 <div>
-                  <button 
+                  <button
                     disabled={loading}
                     className="bg-brand-500 shadow-theme-xs hover:bg-brand-600 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50"
                   >

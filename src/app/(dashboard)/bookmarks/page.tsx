@@ -7,6 +7,7 @@ import Button from "@/components/ui/button/Button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import { Bookmark, BookOpen, Trash2 } from "lucide-react";
+import Spinner from "@/components/ui/spinner";
 
 interface BookmarkedResource {
   id: string;
@@ -100,7 +101,7 @@ export default function BlankPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading...
+        <Spinner size="lg" variant="page" label="Loading bookmarks..." />
       </div>
     );
   }

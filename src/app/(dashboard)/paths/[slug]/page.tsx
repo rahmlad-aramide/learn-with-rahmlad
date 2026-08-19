@@ -7,9 +7,11 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { computePathProgress, type PathProgress } from "@/lib/progress";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import Button from "@/components/ui/button/Button";
+import Spinner from "@/components/ui/spinner";
 import DynamicPageBreadcrumb from "@/components/common/DynamicBreadCrumb";
 
 interface Course {
@@ -34,6 +36,7 @@ export default function CoursePath() {
   const slug = params.slug as string;
   const [path, setPath] = useState<LearningPath | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [progress, setProgress] = useState<PathProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -54,14 +57,37 @@ export default function CoursePath() {
       setPath(pathData);
 
       if (pathData) {
-        const { data: coursesData, error: coursesError } = await supabase
-          .from("courses")
-          .select("*")
+        const { data: courseLinks } = await supabase
+          .from("course_paths")
+          .select("course_id, order_index")
           .eq("learning_path_id", pathData.id)
           .order("order_index");
 
+        const courseIds = (courseLinks ?? []).map(
+          (cl: { course_id: string; order_index: number }) => cl.course_id,
+        );
+
+        const { data: coursesData, error: coursesError } =
+          courseIds.length > 0
+            ? await supabase
+                .from("courses")
+                .select(
+                  "id, title, slug, estimated_hours, order_index, description",
+                )
+                .in("id", courseIds)
+                .order("order_index")
+            : { data: [], error: null };
+
         if (coursesError) throw coursesError;
         setCourses(coursesData || []);
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const p = await computePathProgress(user.id, pathData.id);
+          setProgress(p);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -73,7 +99,7 @@ export default function CoursePath() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading...
+        <Spinner size="lg" variant="page" label="Loading path..." />
       </div>
     );
   }
@@ -116,9 +142,8 @@ export default function CoursePath() {
       </div>
     );
 
-  const completedCourses = 0; // TODO: fetch user progress
-  const progressPercent =
-    courses.length > 0 ? (completedCourses / courses.length) * 100 : 0;
+  const completedCourses = progress?.completedCourses ?? 0;
+  const progressPercent = progress?.percentComplete ?? 0;
 
   return (
     <div>

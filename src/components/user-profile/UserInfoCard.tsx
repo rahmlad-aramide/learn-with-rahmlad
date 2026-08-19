@@ -1,6 +1,8 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useModal } from "../../hooks/useModal";
+import { useCurrentProfile } from "../../hooks/useCurrentProfile";
+import { createClient } from "../../lib/supabase/client";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
@@ -8,11 +10,55 @@ import Label from "../form/Label";
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const { profile, loading, refresh } = useCurrentProfile();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    bio: "",
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        first_name: profile.first_name ?? "",
+        last_name: profile.last_name ?? "",
+        phone: profile.phone ?? "",
+        bio: profile.bio ?? "",
+      });
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!profile) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("profiles")
+        .update(form)
+        .eq("id", profile.id);
+      if (error) throw error;
+      await refresh();
+      setSaved(true);
+      setTimeout(() => {
+        setSaved(false);
+        closeModal();
+      }, 1200);
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Failed to save changes",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
+
   return (
     <div className="rounded-2xl border border-gray-200 p-5 lg:p-6 dark:border-gray-800">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -27,7 +73,7 @@ export default function UserInfoCard() {
                 First Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Musharof
+                {loading ? "—" : profile?.first_name || "—"}
               </p>
             </div>
 
@@ -36,7 +82,7 @@ export default function UserInfoCard() {
                 Last Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Chowdhury
+                {loading ? "—" : profile?.last_name || "—"}
               </p>
             </div>
 
@@ -45,7 +91,7 @@ export default function UserInfoCard() {
                 Email address
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                randomuser@pimjo.com
+                {loading ? "—" : profile?.email || "—"}
               </p>
             </div>
 
@@ -54,7 +100,7 @@ export default function UserInfoCard() {
                 Phone
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                +09 363 398 46
+                {loading ? "—" : profile?.phone || "—"}
               </p>
             </div>
 
@@ -63,7 +109,7 @@ export default function UserInfoCard() {
                 Bio
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Team Manager
+                {loading ? "—" : profile?.bio || "—"}
               </p>
             </div>
           </div>
@@ -103,82 +149,84 @@ export default function UserInfoCard() {
             </p>
           </div>
           <form className="flex flex-col">
-            <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-              <div>
-                <h5 className="mb-5 text-lg font-medium text-gray-800 lg:mb-6 dark:text-white/90">
-                  Social Links
-                </h5>
-
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div>
-                    <Label>Facebook</Label>
-                    <Input
-                      type="text"
-                      defaultValue="https://www.facebook.com/PimjoHQ"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>X.com</Label>
-                    <Input type="text" defaultValue="https://x.com/PimjoHQ" />
-                  </div>
-
-                  <div>
-                    <Label>Linkedin</Label>
-                    <Input
-                      type="text"
-                      defaultValue="https://www.linkedin.com/company/pimjo"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Instagram</Label>
-                    <Input
-                      type="text"
-                      defaultValue="https://instagram.com/PimjoHQ"
-                    />
-                  </div>
+            <div className="custom-scrollbar overflow-y-auto px-2 pb-3">
+              <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+                <div className="col-span-2 lg:col-span-1">
+                  <Label>First Name</Label>
+                  <Input
+                    type="text"
+                    value={form.first_name}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, first_name: e.target.value }))
+                    }
+                  />
                 </div>
-              </div>
-              <div className="mt-7">
-                <h5 className="mb-5 text-lg font-medium text-gray-800 lg:mb-6 dark:text-white/90">
-                  Personal Information
-                </h5>
 
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>First Name</Label>
-                    <Input type="text" defaultValue="Musharof" />
-                  </div>
+                <div className="col-span-2 lg:col-span-1">
+                  <Label>Last Name</Label>
+                  <Input
+                    type="text"
+                    value={form.last_name}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, last_name: e.target.value }))
+                    }
+                  />
+                </div>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Last Name</Label>
-                    <Input type="text" defaultValue="Chowdhury" />
-                  </div>
+                <div className="col-span-2 lg:col-span-1">
+                  <Label>Email Address</Label>
+                  <Input
+                    type="text"
+                    value={profile?.email ?? ""}
+                    disabled
+                    className="cursor-not-allowed opacity-60"
+                  />
+                </div>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Email Address</Label>
-                    <Input type="text" defaultValue="randomuser@pimjo.com" />
-                  </div>
+                <div className="col-span-2 lg:col-span-1">
+                  <Label>Phone</Label>
+                  <Input
+                    type="text"
+                    value={form.phone}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, phone: e.target.value }))
+                    }
+                    placeholder="+1 234 567 890"
+                  />
+                </div>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Phone</Label>
-                    <Input type="text" defaultValue="+09 363 398 46" />
-                  </div>
-
-                  <div className="col-span-2">
-                    <Label>Bio</Label>
-                    <Input type="text" defaultValue="Team Manager" />
-                  </div>
+                <div className="col-span-2">
+                  <Label>Bio</Label>
+                  <Input
+                    type="text"
+                    value={form.bio}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, bio: e.target.value }))
+                    }
+                    placeholder="Tell us a bit about yourself"
+                  />
                 </div>
               </div>
             </div>
+            {saveError && (
+              <p className="px-2 pt-3 text-sm text-red-500">{saveError}</p>
+            )}
             <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={closeModal}>
+              <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                onClick={closeModal}
+              >
                 Close
               </Button>
-              <Button size="sm" onClick={handleSave}>
-                Save Changes
+              <Button
+                size="sm"
+                type="submit"
+                onClick={handleSave}
+                disabled={saving || saved}
+              >
+                {saved ? "Saved ✓" : saving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>

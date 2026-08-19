@@ -1,162 +1,86 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { Bell, BookOpen, CheckCircle, Trash2 } from "lucide-react";
+import { useNotifications } from "@/hooks/useNotifications";
+import {
+  Bell,
+  BookOpen,
+  CheckCircle,
+  Newspaper,
+  Trophy,
+  Trash2,
+} from "lucide-react";
 import Button from "@/components/ui/button/Button";
+import Spinner from "@/components/ui/spinner";
 import { Card } from "@/components/ui/card";
 
-interface Notification {
-  id: string;
-  title: string;
-  description?: string;
-  type: "progress" | "achievement" | "reminder" | "news";
-  is_read: boolean;
-  created_at: string;
-  related_path_id?: string;
+function NotificationIcon({ type }: { type: string }) {
+  switch (type) {
+    case "achievement":
+      return <Trophy className="h-5 w-5 text-yellow-500" />;
+    case "progress":
+      return <BookOpen className="h-5 w-5 text-blue-500" />;
+    case "reminder":
+      return <Bell className="h-5 w-5 text-purple-500" />;
+    default:
+      return <Newspaper className="h-5 w-5 text-gray-400" />;
+  }
 }
-export default function BlankPage() {
-  const [user, setUser] = useState<any>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const supabase = createClient();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const {
-      data: { user: authUser },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (error || !authUser) {
-      router.push("/signin");
-      return;
-    }
-
-    setUser(authUser);
-    await fetchNotifications(authUser.id);
-  };
-
-  const fetchNotifications = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setNotifications(data || []);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const markAsRead = async (notificationId: string) => {
-    try {
-      await supabase
-        .from("notifications")
-        .update({ is_read: true })
-        .eq("id", notificationId);
-
-      setNotifications((prev: any) =>
-        prev.map((n: any) =>
-          n.id === notificationId ? { ...n, is_read: true } : n,
-        ),
-      );
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-    }
-  };
-
-  const deleteNotification = async (notificationId: string) => {
-    try {
-      await supabase.from("notifications").delete().eq("id", notificationId);
-
-      setNotifications((prev: any) =>
-        prev.filter((n: any) => n.id !== notificationId),
-      );
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-    }
-  };
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "achievement":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "progress":
-        return <BookOpen className="h-5 w-5 text-blue-500" />;
-      case "reminder":
-        return <Bell className="h-5 w-5 text-yellow-500" />;
-      default:
-        return <Bell className="text-muted-foreground h-5 w-5" />;
-    }
-  };
+export default function NotificationsPage() {
+  const { notifications, loading, markRead, deleteNotification } =
+    useNotifications(50);
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Loading notifications...</p>
+        <Spinner size="lg" variant="page" label="Loading notifications..." />
       </div>
     );
   }
+
   return (
     <div>
       <PageBreadcrumb pageTitle="Notifications" />
       <div className="mx-auto max-w-7xl pb-12">
         {notifications.length === 0 ? (
           <Card className="p-12 text-center">
-            <Bell className="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
-            <p className="text-muted-foreground">No notifications yet</p>
+            <Bell className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+            <p className="text-gray-400">No notifications yet</p>
           </Card>
         ) : (
           <div className="space-y-4">
-            {notifications.map((notification) => (
+            {notifications.map((n) => (
               <Card
-                key={notification.id}
-                className={`p-6 transition-colors ${!notification.is_read ? "bg-primary/5 border-primary/20" : ""}`}
+                key={n.id}
+                className={`p-6 transition-colors ${!n.is_read ? "border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/5" : ""}`}
               >
                 <div className="flex items-start gap-4">
-                  <div className="shrink-0">
-                    {getNotificationIcon(notification.type)}
+                  <div className="mt-0.5 shrink-0">
+                    <NotificationIcon type={n.type} />
                   </div>
-
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className="mb-1 text-lg font-semibold">
-                          {notification.title}
+                        <h3 className="mb-1 text-base font-semibold text-gray-800 dark:text-white/90">
+                          {n.title}
                         </h3>
-                        {notification.description && (
-                          <p className="text-muted-foreground mb-3 text-sm">
-                            {notification.description}
+                        {n.message && (
+                          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                            {n.message}
                           </p>
                         )}
-                        <p className="text-muted-foreground text-xs">
-                          {new Date(
-                            notification.created_at,
-                          ).toLocaleDateString()}{" "}
-                          at{" "}
-                          {new Date(
-                            notification.created_at,
-                          ).toLocaleTimeString()}
+                        <p className="text-xs text-gray-400">
+                          {new Date(n.created_at).toLocaleDateString()} at{" "}
+                          {new Date(n.created_at).toLocaleTimeString()}
                         </p>
                       </div>
-
                       <div className="flex shrink-0 items-center gap-2">
-                        {!notification.is_read && (
+                        {!n.is_read && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => markAsRead(notification.id)}
+                            type="button"
+                            onClick={() => markRead(n.id)}
                             className="text-xs"
                           >
                             Mark as read
@@ -164,9 +88,9 @@ export default function BlankPage() {
                         )}
                         <Button
                           variant="ghost"
-                          // size="icon"
-                          onClick={() => deleteNotification(notification.id)}
-                          className="text-muted-foreground hover:text-destructive"
+                          type="button"
+                          onClick={() => deleteNotification(n.id)}
+                          className="text-gray-400 hover:text-red-500"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

@@ -50,13 +50,17 @@ export default function LearningTarget() {
           return;
         }
 
-        const completedCount = progressData.filter((p: any) => p.completed).length;
-        const inProgressCount = progressData.filter((p: any) => !p.completed).length;
+        const completedCount = progressData.filter(
+          (p: any) => p.completed,
+        ).length;
+        const inProgressCount = progressData.filter(
+          (p: any) => !p.completed,
+        ).length;
 
         // To calculate pending properly, we should know the total resources in paths the user started
         // For simplicity right now we'll calculate an overall percentage of completed vs started
         const totalStarted = completedCount + inProgressCount;
-        
+
         let percentage = 0;
         if (totalStarted > 0) {
           percentage = Math.round((completedCount / totalStarted) * 100);
@@ -67,7 +71,7 @@ export default function LearningTarget() {
           inProgress: inProgressCount,
           // Calculating real pending would require joining with resources/courses.
           // For now, if no other data is available, we display total started as target base.
-          // So pending means things started but not completed nor touched? 
+          // So pending means things started but not completed nor touched?
           // Technically inProgress is touched, so pending = 0 if we just consider what they've started.
           pending: 0,
           percentage: percentage,
@@ -142,7 +146,7 @@ export default function LearningTarget() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/3 h-full">
+    <div className="h-full rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/3">
       <div className="shadow-default rounded-2xl bg-white px-5 pt-5 pb-11 sm:px-6 sm:pt-6 dark:bg-gray-900">
         <div className="flex justify-between">
           <div>

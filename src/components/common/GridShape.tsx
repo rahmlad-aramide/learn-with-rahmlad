@@ -35,7 +35,7 @@ export function InvertedGridShape() {
           alt="grid"
         />
       </div>
-      <div className="absolute bottom-0 right-0 -z-1 w-full max-w-[250px] rotate-180 xl:max-w-[450px]">
+      <div className="absolute right-0 bottom-0 -z-1 w-full max-w-[250px] rotate-180 xl:max-w-[450px]">
         <Image
           width={540}
           height={254}

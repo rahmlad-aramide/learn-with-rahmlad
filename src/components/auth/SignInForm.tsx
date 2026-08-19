@@ -26,7 +26,7 @@ export default function SignInForm() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        router.push("/");
+        router.push("/my-learning");
       }
       setCheckingAuth(false);
     };
@@ -46,7 +46,7 @@ export default function SignInForm() {
 
       if (error) throw error;
 
-      router.push("/");
+      router.push("/my-learning");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -127,7 +127,7 @@ export default function SignInForm() {
                 Sign in with X
               </button>
             </div>
-            <div className="hidden relative py-3 sm:py-5">
+            <div className="relative hidden py-3 sm:py-5">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
               </div>
@@ -143,9 +143,9 @@ export default function SignInForm() {
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input 
-                    placeholder="info@gmail.com" 
-                    type="email" 
+                  <Input
+                    placeholder="info@gmail.com"
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
@@ -197,12 +197,12 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 {error && (
-                  <div className="rounded-md bg-error-50 p-3 text-sm text-error-500 dark:bg-error-500/10 fade-in-0 slide-in-from-top-1 animate-in">
+                  <div className="bg-error-50 text-error-500 dark:bg-error-500/10 fade-in-0 slide-in-from-top-1 animate-in rounded-md p-3 text-sm">
                     {error}
                   </div>
                 )}
                 <div>
-                  <Button className="w-full" size="sm" disabled={loading}>
+                  <Button type="submit" className="w-full" size="sm" disabled={loading}>
                     {loading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>

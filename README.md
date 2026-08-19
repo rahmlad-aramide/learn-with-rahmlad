@@ -2,7 +2,6 @@
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/rahmladaramides-projects/v0-learning-resources-website)
 
-
 Learning Hub is a modern, feature-rich learning management system built with React, TypeScript, Tailwind CSS, and Supabase. It provides a seamless learning experience with course management, video integration, progress tracking, and role-based access control.
 
 ## Features
@@ -32,24 +31,28 @@ Learning Hub is a modern, feature-rich learning management system built with Rea
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd learn-hub
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Environment Setup**
    Create a `.env.local` file in the root directory with your Supabase credentials:
+
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    ```
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -74,13 +77,13 @@ npm run start
 
 ### Scripts
 
-| Script | Description |
-|--------|-------------|
-| `dev` | Starts the development server |
-| `build` | Builds the application for production |
-| `start` | Runs the production build |
-| `lint` | Runs ESLint to check for code quality issues |
-| `lint:fix` | Fixes ESLint issues automatically |
+| Script     | Description                                  |
+| ---------- | -------------------------------------------- |
+| `dev`      | Starts the development server                |
+| `build`    | Builds the application for production        |
+| `start`    | Runs the production build                    |
+| `lint`     | Runs ESLint to check for code quality issues |
+| `lint:fix` | Fixes ESLint issues automatically            |
 
 ## Directory Structure
 
@@ -104,6 +107,7 @@ src/
 ## Supabase Integration
 
 This application uses Supabase for backend services:
+
 - **Authentication**: User signup, login, and session management
 - **Database**: Course, module, and user data storage
 - **Storage**: File and asset management

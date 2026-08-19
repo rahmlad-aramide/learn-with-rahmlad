@@ -1,5 +1,11 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -15,7 +21,9 @@ import {
   BookMarkedIcon,
   BookOpenText,
   NotebookPen,
+  ShieldCheck,
 } from "lucide-react";
+import { useCurrentProfile } from "../hooks/useCurrentProfile";
 
 type NavItem = {
   name: string;
@@ -60,6 +68,28 @@ const navItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { profile } = useCurrentProfile();
+  const isAdmin = profile?.role === "admin";
+  const isGoldenGeneration = profile?.is_golden_generation === true;
+
+  const allNavItems = useMemo<NavItem[]>(
+    () => [
+      ...navItems,
+      ...(isGoldenGeneration
+        ? [
+            {
+              icon: <span>🏆</span>,
+              name: "My Progress",
+              path: "/golden-generation",
+            } as NavItem,
+          ]
+        : []),
+      ...(isAdmin
+        ? [{ icon: <ShieldCheck />, name: "Admin", path: "/admin" } as NavItem]
+        : []),
+    ],
+    [isAdmin, isGoldenGeneration],
+  );
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -203,7 +233,7 @@ const AppSidebar: React.FC = () => {
     // Check if the current path matches any submenu item
     let submenuMatched = false;
     ["main"].forEach((menuType) => {
-      navItems.forEach((nav, index) => {
+      allNavItems.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
@@ -222,7 +252,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname, isActive]);
+  }, [pathname, isActive, allNavItems]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -298,7 +328,7 @@ const AppSidebar: React.FC = () => {
       <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            <div>{renderMenuItems(navItems, "main")}</div>
+            <div>{renderMenuItems(allNavItems, "main")}</div>
           </div>
         </nav>
       </div>

@@ -1,6 +1,8 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useModal } from "../../hooks/useModal";
+import { useCurrentProfile } from "../../hooks/useCurrentProfile";
+import { createClient } from "../../lib/supabase/client";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
@@ -8,11 +10,55 @@ import Label from "../form/Label";
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
-  const handleSave = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
-    closeModal();
+  const { profile, loading, refresh } = useCurrentProfile();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const [form, setForm] = useState({
+    country: "",
+    city: "",
+    postal_code: "",
+    tax_id: "",
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        country: profile.country ?? "",
+        city: profile.city ?? "",
+        postal_code: profile.postal_code ?? "",
+        tax_id: profile.tax_id ?? "",
+      });
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!profile) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("profiles")
+        .update(form)
+        .eq("id", profile.id);
+      if (error) throw error;
+      await refresh();
+      setSaved(true);
+      setTimeout(() => {
+        setSaved(false);
+        closeModal();
+      }, 1200);
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Failed to save changes",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
+
   return (
     <>
       <div className="rounded-2xl border border-gray-200 p-5 lg:p-6 dark:border-gray-800">
@@ -28,7 +74,7 @@ export default function UserAddressCard() {
                   Country
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  United States
+                  {loading ? "—" : profile?.country || "—"}
                 </p>
               </div>
 
@@ -37,7 +83,7 @@ export default function UserAddressCard() {
                   City/State
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Phoenix, Arizona, United States.
+                  {loading ? "—" : profile?.city || "—"}
                 </p>
               </div>
 
@@ -46,7 +92,7 @@ export default function UserAddressCard() {
                   Postal Code
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  ERT 2489
+                  {loading ? "—" : profile?.postal_code || "—"}
                 </p>
               </div>
 
@@ -55,7 +101,7 @@ export default function UserAddressCard() {
                   TAX ID
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  AS4568384
+                  {loading ? "—" : profile?.tax_id || "—"}
                 </p>
               </div>
             </div>
@@ -84,6 +130,7 @@ export default function UserAddressCard() {
           </button>
         </div>
       </div>
+
       <Modal isOpen={isOpen} onClose={closeModal} className="m-4 max-w-[700px]">
         <div className="no-scrollbar relative w-full overflow-y-auto rounded-3xl bg-white p-4 lg:p-11 dark:bg-gray-900">
           <div className="px-2 pr-14">
@@ -91,7 +138,7 @@ export default function UserAddressCard() {
               Edit Address
             </h4>
             <p className="mb-6 text-sm text-gray-500 lg:mb-7 dark:text-gray-400">
-              Update your details to keep your profile up-to-date.
+              Update your address details.
             </p>
           </div>
           <form className="flex flex-col">
@@ -99,31 +146,72 @@ export default function UserAddressCard() {
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <Label>Country</Label>
-                  <Input type="text" defaultValue="United States" />
+                  <Input
+                    type="text"
+                    value={form.country}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, country: e.target.value }))
+                    }
+                    placeholder="e.g. Nigeria"
+                  />
                 </div>
 
                 <div>
                   <Label>City/State</Label>
-                  <Input type="text" defaultValue="Arizona, United States." />
+                  <Input
+                    type="text"
+                    value={form.city}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, city: e.target.value }))
+                    }
+                    placeholder="e.g. Lagos, Nigeria"
+                  />
                 </div>
 
                 <div>
                   <Label>Postal Code</Label>
-                  <Input type="text" defaultValue="ERT 2489" />
+                  <Input
+                    type="text"
+                    value={form.postal_code}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, postal_code: e.target.value }))
+                    }
+                    placeholder="e.g. 100001"
+                  />
                 </div>
 
                 <div>
                   <Label>TAX ID</Label>
-                  <Input type="text" defaultValue="AS4568384" />
+                  <Input
+                    type="text"
+                    value={form.tax_id}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, tax_id: e.target.value }))
+                    }
+                    placeholder="Optional"
+                  />
                 </div>
               </div>
             </div>
+            {saveError && (
+              <p className="px-2 pt-3 text-sm text-red-500">{saveError}</p>
+            )}
             <div className="mt-6 flex items-center gap-3 px-2 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={closeModal}>
+              <Button
+                size="sm"
+                variant="outline"
+                type="button"
+                onClick={closeModal}
+              >
                 Close
               </Button>
-              <Button size="sm" onClick={handleSave}>
-                Save Changes
+              <Button
+                size="sm"
+                type="submit"
+                onClick={handleSave}
+                disabled={saving || saved}
+              >
+                {saved ? "Saved ✓" : saving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>

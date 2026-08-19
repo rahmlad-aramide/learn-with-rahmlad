@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import Button from "@/components/ui/button/Button";
+import Spinner from "@/components/ui/spinner";
 import DynamicPageBreadcrumb from "@/components/common/DynamicBreadCrumb";
 
 interface Resource {
@@ -25,6 +26,10 @@ interface Resource {
   type: "video" | "article" | "interactive";
   url?: string;
   video_embed_url?: string;
+  video_url?: string;
+  details?: string;
+  source?: string;
+  difficulty?: string;
   estimated_minutes?: number;
   order_index: number;
 }
@@ -32,7 +37,6 @@ interface Resource {
 interface Course {
   id: string;
   title: string;
-  learning_path_id: string;
 }
 
 export default function CoursePage() {
@@ -196,7 +200,7 @@ export default function CoursePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading...
+        <Spinner size="lg" variant="page" label="Loading course..." />
       </div>
     );
   }
@@ -295,6 +299,16 @@ export default function CoursePage() {
                   ) : (
                     <p className="text-muted-foreground">
                       No content available yet
+                    </p>
+                  )}
+                  {selectedResource.details && (
+                    <p className="text-muted-foreground mt-4 text-sm">
+                      {selectedResource.details}
+                    </p>
+                  )}
+                  {selectedResource.source && (
+                    <p className="text-muted-foreground mt-2 text-xs">
+                      Source: {selectedResource.source}
                     </p>
                   )}
                 </Card>
