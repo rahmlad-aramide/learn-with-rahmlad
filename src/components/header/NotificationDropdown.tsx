@@ -99,9 +99,9 @@ export default function NotificationDropdown() {
           </button>
         </div>
 
-        <ul className="custom-scrollbar flex h-auto flex-col overflow-y-auto mb-3">
+        <ul className="custom-scrollbar mb-3 flex h-auto flex-col overflow-y-auto">
           {notifications.length === 0 ? (
-            <li className="flex flex-1 h-full items-center justify-center py-10 text-sm text-gray-400">
+            <li className="flex h-full flex-1 items-center justify-center py-10 text-sm text-gray-400">
               No notifications yet
             </li>
           ) : (
@@ -111,7 +111,7 @@ export default function NotificationDropdown() {
                   onItemClick={() => handleItemClick(n.id, n.is_read)}
                   className={`flex gap-3 rounded-lg border-b border-gray-100 px-4 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5 ${!n.is_read ? "bg-orange-50 dark:bg-orange-500/5" : ""}`}
                 >
-                  <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
                     {typeIcon(n.type)}
                   </span>
                   <span className="block min-w-0">

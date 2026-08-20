@@ -113,7 +113,7 @@ export default function BrowsePage() {
   };
 
   return (
-    <div className="bg-background flex min-h-screen">
+    <div className="bg-background flex min-h-screen dark:bg-transparent">
       <div className={"w-full"}>
         <div className="mx-auto max-w-7xl space-y-6 pb-12">
           <div className="mb-8">
@@ -125,7 +125,7 @@ export default function BrowsePage() {
 
           <div className="mb-8 space-y-6">
             <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform" />
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform dark:text-white" />
               <Input
                 type="search"
                 placeholder="Search learning paths..."
@@ -160,18 +160,16 @@ export default function BrowsePage() {
                     className="flex flex-col items-start justify-start p-2.5!"
                   >
                     <span className="font-bold">{cat.name}</span>
-                    <span className="text-left text-xs">
-                      {cat.description}
-                    </span>
+                    <span className="text-left text-xs">{cat.description}</span>
                   </Button>
                 ))}
               </div>
             </div>
 
             <div>
-              <h3 className="mb-3 font-semibold flex items-center gap-2">
+              <h3 className="mb-3 flex items-center gap-2 font-semibold">
                 <Filter className="h-4 w-4" />
-                 Filter by Difficulty Level
+                Filter by Difficulty Level
               </h3>
               <div className="flex flex-wrap gap-3">
                 {["Beginner", "Intermediate", "Advanced"].map((level) => (
@@ -221,7 +219,7 @@ export default function BrowsePage() {
                     className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg"
                   >
                     <div className="flex flex-1 flex-col px-6">
-                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 text-gray-700">
+                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100">
                         <BookOpen className="h-6 w-6" />
                       </div>
                       <div className="mb-2 flex items-start justify-between">

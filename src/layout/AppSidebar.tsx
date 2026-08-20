@@ -22,6 +22,7 @@ import {
   BookOpenText,
   NotebookPen,
   ShieldCheck,
+  Trophy
 } from "lucide-react";
 import { useCurrentProfile } from "../hooks/useCurrentProfile";
 
@@ -74,16 +75,16 @@ const AppSidebar: React.FC = () => {
 
   const allNavItems = useMemo<NavItem[]>(
     () => [
-      ...navItems,
       ...(isGoldenGeneration
         ? [
             {
-              icon: <span>🏆</span>,
-              name: "My Progress",
+              icon: <Trophy />,
+              name: "My Golden Progress",
               path: "/golden-generation",
             } as NavItem,
           ]
         : []),
+      ...navItems,
       ...(isAdmin
         ? [{ icon: <ShieldCheck />, name: "Admin", path: "/admin" } as NavItem]
         : []),

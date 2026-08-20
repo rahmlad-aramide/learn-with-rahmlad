@@ -13,7 +13,7 @@ export function StreakWidget() {
   });
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3 h-full">
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-500/10">
         <Flame className="size-6 text-orange-500" />
       </div>

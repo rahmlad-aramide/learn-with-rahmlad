@@ -14,7 +14,7 @@ export function BadgesWidget() {
   const { recentBadges, loading } = useUserStats();
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3 h-full">
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-100 dark:bg-yellow-500/10">
         <Medal className="size-6 text-yellow-500" />
       </div>
@@ -24,12 +24,6 @@ export function BadgesWidget() {
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Recent Badges
           </span>
-          <Link
-            href="/profile"
-            className="text-brand-500 text-xs hover:underline"
-          >
-            View all
-          </Link>
         </div>
 
         <div className="mt-3 space-y-2">

@@ -11,18 +11,18 @@ import {
   Medal,
   Users,
 } from "lucide-react";
-import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 
 import { Card } from "@/components/ui/card";
 import { createServerClientInstance } from "@/lib/supabase/server";
 import Badge from "@/components/ui/badge/Badge";
+import LandingNav from "@/components/landing/LandingNav";
+import LandingContact from "@/components/landing/LandingContact";
 import Button from "@/components/ui/button/Button";
 import GridShape from "@/components/common/GridShape";
 
 export default async function Home() {
-  const cookieStore = await cookies();
   const supabase = await createServerClientInstance();
 
   const {
@@ -31,47 +31,7 @@ export default async function Home() {
 
   return (
     <main className="bg-background text-foreground min-h-screen">
-      {/* Navigation */}
-      <nav className="border-border bg-background/50 sticky top-0 z-20 border-b backdrop-blur-2xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <>
-                <Image
-                  className="dark:hidden"
-                  src="/images/logo/logo.svg"
-                  alt="Logo"
-                  width={150}
-                  height={40}
-                />
-                <Image
-                  className="hidden dark:block"
-                  src="/images/logo/logo-dark.svg"
-                  alt="Logo"
-                  width={150}
-                  height={40}
-                />
-              </>
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/browse">
-              <Button variant={user ? "outline" : "ghost"}>
-                Browse Resources
-              </Button>
-            </Link>
-            {user ? (
-              <Link href="/my-learning">
-                <Button variant="primary">My Learning</Button>
-              </Link>
-            ) : (
-              <Link href="/signup">
-                <Button>Get Started</Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      <LandingNav isLoggedIn={!!user} />
 
       <div className="bg-background min-h-screen">
         {/* Hero */}
@@ -84,7 +44,7 @@ export default async function Home() {
               >
                 <Rocket /> Built by engineers, for the next generation
               </Badge>
-              <hgroup className="text-6xl leading-[1.1] font-extrabold tracking-tight text-balance sm:text-7xl">
+              <hgroup className="xsm:text-6xl text-5xl leading-[1.1] font-extrabold tracking-tight text-balance sm:text-7xl">
                 <h1>
                   Stop scrolling.{" "}
                   <span className="from-primary bg-linear-to-r to-blue-600 bg-clip-text text-transparent">
@@ -331,7 +291,7 @@ export default async function Home() {
 
         {/* Learning paths */}
         <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mb-12 flex items-end justify-between">
+          <div className="mb-12 flex flex-col justify-between md:flex-row md:items-end">
             <div>
               <h2 className="text-3xl font-bold">
                 What are you curious about?
@@ -340,32 +300,32 @@ export default async function Home() {
                 Join thousands of students in these top-rated tracks.
               </p>
             </div>
-            <Link href="/browse">
+            <Link href="/browse" className="hidden md:flex">
               <Button variant="link" className="hidden sm:flex">
                 View all paths
               </Button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 title: "The Modern Full Stack",
                 tag: "Most Popular",
                 desc: "From React basics to deploying scalable cloud apps.",
-                students: "4.2k learners",
+                students: "1.2k learners",
               },
               {
                 title: "The Logic of Backend",
                 tag: "Trending",
                 desc: "Master APIs, Databases, and System Design.",
-                students: "2.8k learners",
+                students: "800 learners",
               },
               {
                 title: "UI/UX for Developers",
                 tag: "Essential",
                 desc: "Learn to build interfaces that don't look like developer tools.",
-                students: "1.5k learners",
+                students: "500 learners",
               },
             ].map((path, i) => (
               <Card
@@ -381,7 +341,7 @@ export default async function Home() {
                     {path.students}
                   </div>
                   <Link href="/browse">
-                    <Button className="group-hover:bg-primary w-full transition-colors">
+                    <Button className="w-full transition-colors">
                       Start Learning
                     </Button>
                   </Link>
@@ -394,7 +354,7 @@ export default async function Home() {
         {/* Golden Generation community callout */}
         <section className="border-border border-t py-24">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-3xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50 p-12 text-center dark:border-yellow-500/20 dark:from-yellow-500/5 dark:to-amber-500/5">
+            <div className="rounded-3xl border border-yellow-200 bg-linear-to-br from-yellow-50 to-amber-50 px-4 py-6 md:p-12 text-center dark:border-yellow-500/20 dark:from-yellow-500/5 dark:to-amber-500/5">
               <Badge
                 variant="light"
                 color="warning"
@@ -402,7 +362,7 @@ export default async function Home() {
               >
                 Community Program
               </Badge>
-              <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-800 dark:text-white/90 sm:text-4xl">
+              <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-800 sm:text-4xl dark:text-white/90">
                 Golden Generation Community
               </h2>
               <p className="mx-auto mb-8 max-w-2xl text-gray-600 dark:text-gray-300">
@@ -444,6 +404,9 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Contact */}
+        <LandingContact />
+
         {/* Footer */}
         <footer className="border-border bg-muted/20 border-t py-16">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
@@ -471,19 +434,34 @@ export default async function Home() {
               developers who remember what it&apos;s like to be a beginner.
             </p>
             <div className="text-muted-foreground mb-8 flex justify-center gap-8 text-sm">
-              <Link href="#" className="hover:text-primary">
+              <Link
+                href="https://x.com/Dev_Rahmlad"
+                className="hover:text-primary"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
                 Twitter
               </Link>
-              <Link href="#" className="hover:text-primary">
+              <Link
+                href="https://discord.gg/MXsDuWthPN"
+                className="hover:text-primary"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
                 Discord
               </Link>
-              <Link href="#" className="hover:text-primary">
+              <Link
+                href="https://github.com/rahmlad-aramide/learn-with-rahmlad"
+                className="hover:text-primary"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
                 GitHub
               </Link>
             </div>
             <p className="text-muted-foreground/60 text-xs">
-              &copy; {new Date().getFullYear()} LearnWithRahmlad. No cookies,
-              no trackers, just learning.
+              &copy; {new Date().getFullYear()} LearnWithRahmlad. No cookies, no
+              trackers, just learning.
             </p>
           </div>
         </footer>

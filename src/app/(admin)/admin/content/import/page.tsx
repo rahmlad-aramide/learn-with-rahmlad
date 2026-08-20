@@ -158,7 +158,9 @@ export default function ContentImportPage() {
                     title: pathName,
                     slug,
                     difficulty_level: normalized,
-                    ...(resolvedCategoryId ? { category_id: resolvedCategoryId } : {}),
+                    ...(resolvedCategoryId
+                      ? { category_id: resolvedCategoryId }
+                      : {}),
                   })
                   .select("id")
                   .single();
@@ -221,7 +223,8 @@ export default function ContentImportPage() {
         const videoEmbed = row["VIDEO EMBEDDED LINK"]?.trim() || null;
         const textUrl = row["TEXTUAL RESOURCE LINKS"]?.trim() || null;
         const videoTutorialUrl = row["VIDEO TUTORIAL"]?.trim() || null;
-        const resourceType = videoEmbed || videoTutorialUrl ? "video" : "article";
+        const resourceType =
+          videoEmbed || videoTutorialUrl ? "video" : "article";
         const url = textUrl || videoEmbed || videoTutorialUrl || null;
 
         try {
@@ -337,7 +340,9 @@ export default function ContentImportPage() {
                 {preview.map((row, i) => (
                   <tr key={i} className="bg-white dark:bg-white/[0.02]">
                     <td className="px-3 py-2 text-gray-600">{row["SN"]}</td>
-                    <td className="px-3 py-2 text-gray-600">{row["CATEGORY"]}</td>
+                    <td className="px-3 py-2 text-gray-600">
+                      {row["CATEGORY"]}
+                    </td>
                     <td className="px-3 py-2 text-gray-600">{row["PATH"]}</td>
                     <td className="px-3 py-2 font-medium text-gray-700">
                       {row["COURSE/CHALLENGE"]}
@@ -356,7 +361,7 @@ export default function ContentImportPage() {
 
           <button
             onClick={runImport}
-            className="bg-brand-500 hover:bg-brand-600 mt-4 rounded-lg px-6 py-2.5 text-sm font-medium text-white active:scale-90 transition duration-200 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="bg-brand-500 hover:bg-brand-600 mt-4 rounded-lg px-6 py-2.5 text-sm font-medium text-white transition duration-200 active:scale-90 disabled:cursor-not-allowed disabled:bg-gray-400"
           >
             Run Import
           </button>

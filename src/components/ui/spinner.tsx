@@ -18,7 +18,13 @@ const sizeMap: Record<SpinnerSize, string> = {
   xl: "h-8 w-8",
 };
 
-function SpinnerIcon({ size = "sm", className }: { size?: SpinnerSize; className?: string }) {
+function SpinnerIcon({
+  size = "sm",
+  className,
+}: {
+  size?: SpinnerSize;
+  className?: string;
+}) {
   return (
     <svg
       className={cn("animate-spin", sizeMap[size], className)}

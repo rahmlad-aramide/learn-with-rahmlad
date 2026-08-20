@@ -22,7 +22,7 @@ export function useNotifications(limit = 20) {
     async (userId: string) => {
       const { data } = await supabase
         .from("notifications")
-        .select("id, title, message, type, is_read, created_at")
+        .select("id, title, type, is_read, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(limit);

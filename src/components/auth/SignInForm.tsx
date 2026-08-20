@@ -66,13 +66,13 @@ export default function SignInForm() {
   return (
     <div className="flex w-full flex-1 flex-col lg:w-1/2">
       <div className="mx-auto mb-5 w-full max-w-md sm:pt-10">
-        <Link
-          href="/"
+        <button
+          onClick={() => router.back()}
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <ChevronLeftIcon />
-          Back to Home
-        </Link>
+          Go Back
+        </button>
       </div>
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
         <div>
@@ -202,7 +202,12 @@ export default function SignInForm() {
                   </div>
                 )}
                 <div>
-                  <Button type="submit" className="w-full" size="sm" disabled={loading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="sm"
+                    disabled={loading}
+                  >
                     {loading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>

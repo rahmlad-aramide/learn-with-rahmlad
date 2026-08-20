@@ -1,15 +1,12 @@
+"use client";
 import GridShape from "@/components/common/GridShape";
-import { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Error 404 | Learn with Rahmlad",
-  description:
-    "Learn with Rahmlad - Software Engineering Learning Website powered by Rahmlad Solutions",
-};
+import React from "react";
+import { useRouter } from "next/navigation";
 
 export default function Error404() {
+  const router = useRouter();
+
   return (
     <div className="relative z-1 flex min-h-screen flex-col items-center justify-center overflow-hidden p-6">
       <GridShape />
@@ -34,19 +31,18 @@ export default function Error404() {
         />
 
         <p className="mt-10 mb-6 text-base text-gray-700 sm:text-lg dark:text-gray-400">
-          We can’t seem to find the page you are looking for!
+          We can&apos;t seem to find the page you are looking for!
         </p>
 
-        <Link
-          href="/"
+        <button
+          onClick={() => router.back()}
           className="shadow-theme-xs inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
         >
-          Back to Home Page
-        </Link>
+          Go Back
+        </button>
       </div>
-      {/* <!-- Footer --> */}
       <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-sm text-gray-500 dark:text-gray-400">
-        &copy; {new Date().getFullYear()} - TailAdmin
+        &copy; {new Date().getFullYear()} - Learn With Rahmlad
       </p>
     </div>
   );
